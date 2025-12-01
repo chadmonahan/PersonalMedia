@@ -1,0 +1,12 @@
+{
+    // "files.exclude": {
+    //     ".github": true,
+    //     ".gitignore": true,
+    //     "**/bin": true,
+    //     "**/obj": true,
+    //     "**/wwwroot/js/*.js": true
+    // },
+    "dotnet.defaultSolution": "PersonalMedia.slnx",
+    "debug.internalConsoleOptions": "openOnFirstSessionStart",
+    "explorer.autoReveal": true
+}

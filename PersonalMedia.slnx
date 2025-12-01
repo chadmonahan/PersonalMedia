@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="PersonalMedia.Domain/PersonalMedia.Domain.csproj" />
+  <Project Path="PersonalMedia.Core/PersonalMedia.Core.csproj" />
+  <Project Path="PersonalMedia.Data/PersonalMedia.Data.csproj" />
+  <Project Path="PersonalMedia.Services/PersonalMedia.Services.csproj" />
+  <Project Path="PersonalMedia.Functions/PersonalMedia.Functions.csproj" />
+  <Project Path="PersonalMedia.Web/PersonalMedia.Web.csproj" />
+</Solution>
