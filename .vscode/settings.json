@@ -7,6 +7,10 @@
     //     "**/wwwroot/js/*.js": true
     // },
     "dotnet.defaultSolution": "PersonalMedia.slnx",
-    "debug.internalConsoleOptions": "openOnFirstSessionStart",
-    "explorer.autoReveal": true
+    "debug.internalConsoleOptions": "neverOpen",
+    "explorer.autoReveal": true,
+    "azureFunctions.deploySubpath": "PersonalMedia.Functions/bin/Release/net10.0/publish",
+    "azureFunctions.projectLanguage": "C#",
+    "azureFunctions.projectRuntime": "~4",
+    "azureFunctions.preDeployTask": "publish (functions)"
 }
