@@ -1,0 +1,162 @@
+@page "/app"
+@inject IAuthenticationService AuthService
+@inject IMediaService MediaService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Personal Media</PageTitle>
+
+@if (!isAuthenticated)
+{
+    <div class="text-center mt-5">
+        <p>Redirecting to sign in...</p>
+    </div>
+}
+else
+{
+    <div class="app-container">
+        <nav class="navbar navbar-light bg-light border-bottom sticky-top">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">Personal Media</span>
+                <a href="/auth/logout" class="btn btn-sm btn-outline-secondary">Sign Out</a>
+            </div>
+        </nav>
+
+        <div class="content-container">
+            @if (mediaSets == null)
+            {
+                <div class="text-center mt-5">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else if (!mediaSets.Any())
+            {
+                <div class="text-center mt-5">
+                    <p class="text-muted">No media available yet. Check back soon!</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var set in mediaSets)
+                {
+                    <div class="media-set" data-set-id="@set.Id">
+                        @if (set.MediaItems.Any())
+                        {
+                            <MediaCarousel MediaSet="@set"
+                                           OnReactionToggle="HandleReactionToggle"
+                                           OnImageClick="OpenImageModal" />
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <ImageModal @ref="imageModal" OnReactionToggle="HandleReactionToggle" />
+}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    .app-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content-container {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .media-set {
+        min-height: calc(100vh - 56px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        padding: 20px 0;
+    }
+</style>
+
+@code {
+    private bool isAuthenticated;
+    private List<MediaSet>? mediaSets;
+    private ImageModal? imageModal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isAuthenticated = AuthService.IsAuthenticated;
+
+        if (!isAuthenticated)
+        {
+            Navigation.NavigateTo("/signin");
+            return;
+        }
+
+        await LoadMediaSets();
+    }
+
+    private async Task LoadMediaSets()
+    {
+        mediaSets = await MediaService.GetMediaSetsAsync();
+    }
+
+    private async Task HandleReactionToggle(ReactionToggleEventArgs args)
+    {
+        var result = await MediaService.ToggleReactionAsync(args.MediaItemId, args.ReactionType);
+
+        // Update the local state
+        if (mediaSets != null)
+        {
+            foreach (var set in mediaSets)
+            {
+                var item = set.MediaItems.FirstOrDefault(m => m.Id == args.MediaItemId);
+                if (item != null)
+                {
+                    // Clear existing reactions
+                    item.Reactions.Clear();
+
+                    // Add reactions based on result
+                    if (result.HasLike)
+                    {
+                        item.Reactions.Add(new MediaReaction
+                        {
+                            MediaItemId = args.MediaItemId,
+                            ReactionType = ReactionType.Like
+                        });
+                    }
+                    if (result.HasDislike)
+                    {
+                        item.Reactions.Add(new MediaReaction
+                        {
+                            MediaItemId = args.MediaItemId,
+                            ReactionType = ReactionType.Dislike
+                        });
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Update modal if it's showing this item
+        if (imageModal != null)
+        {
+            imageModal.UpdateReactions(args.MediaItemId, result.HasLike, result.HasDislike);
+        }
+
+        StateHasChanged();
+    }
+
+    private void OpenImageModal(ImageClickEventArgs args)
+    {
+        imageModal?.Show(args.ImageUrl, args.MediaItemId, args.HasLike, args.HasDislike);
+    }
+}

@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/PersonalMedia.Web/PersonalMedia.Web.csproj",
+                "${workspaceFolder}/PersonalMedia.Blazor.Server/PersonalMedia.Blazor.Server.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/PersonalMedia.Web/PersonalMedia.Web.csproj"
+                "${workspaceFolder}/PersonalMedia.Blazor.Server/PersonalMedia.Blazor.Server.csproj"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -49,7 +49,7 @@
                 "--project",
                 "${workspaceFolder}/PersonalMedia.Data/PersonalMedia.Data.csproj",
                 "--startup-project",
-                "${workspaceFolder}/PersonalMedia.Web/PersonalMedia.Web.csproj"
+                "${workspaceFolder}/PersonalMedia.Blazor.Server/PersonalMedia.Blazor.Server.csproj"
             ],
             "problemMatcher": []
         },
@@ -64,7 +64,7 @@
                 "--project",
                 "${workspaceFolder}/PersonalMedia.Data/PersonalMedia.Data.csproj",
                 "--startup-project",
-                "${workspaceFolder}/PersonalMedia.Web/PersonalMedia.Web.csproj"
+                "${workspaceFolder}/PersonalMedia.Blazor.Server/PersonalMedia.Blazor.Server.csproj"
             ],
             "problemMatcher": []
         },

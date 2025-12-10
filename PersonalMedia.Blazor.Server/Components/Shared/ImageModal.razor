@@ -1,0 +1,150 @@
+@inject IJSRuntime JSRuntime
+
+<div class="modal fade @(isVisible ? "show" : "")" id="imageModal" tabindex="-1" style="display: @(isVisible ? "block" : "none")">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close btn-close-white" @onclick="Hide"></button>
+            </div>
+            <div class="modal-body d-flex align-items-center justify-content-center">
+                <div class="pinch-zoom-container">
+                    <img id="modalImage" src="@currentImageUrl" alt="Full size" class="img-fluid modal-image">
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <div class="reaction-buttons-modal">
+                    <button class="btn-reaction btn-like @(hasLike ? "active" : "")"
+                            @onclick="@(() => HandleReaction("like"))">
+                        <svg width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                        </svg>
+                    </button>
+                    <button class="btn-reaction btn-dislike @(hasDislike ? "active" : "")"
+                            @onclick="@(() => HandleReaction("dislike"))">
+                        <svg width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (isVisible)
+{
+    <div class="modal-backdrop fade show" @onclick="Hide"></div>
+}
+
+<style>
+    .modal {
+        z-index: 1055;
+    }
+
+    .modal-backdrop {
+        z-index: 1050;
+    }
+
+    .pinch-zoom-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .modal-image {
+        max-width: 100%;
+        max-height: calc(100vh - 200px);
+        object-fit: contain;
+        touch-action: pan-x pan-y pinch-zoom;
+    }
+
+    .reaction-buttons-modal {
+        display: flex;
+        gap: 40px;
+    }
+
+    .btn-reaction {
+        background: white;
+        border: 3px solid #ddd;
+        border-radius: 50%;
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        padding: 0;
+    }
+
+    .btn-reaction:hover {
+        transform: scale(1.1);
+    }
+
+    .btn-like.active {
+        background: #ff69b4;
+        border-color: #ff1493;
+    }
+
+    .btn-like.active svg {
+        fill: white;
+    }
+
+    .btn-dislike.active {
+        background: #dc3545;
+        border-color: #a71d2a;
+    }
+
+    .btn-dislike.active svg {
+        fill: white;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public EventCallback<ReactionToggleEventArgs> OnReactionToggle { get; set; }
+
+    private bool isVisible = false;
+    private string currentImageUrl = string.Empty;
+    private int currentMediaItemId;
+    private bool hasLike;
+    private bool hasDislike;
+
+    public void Show(string imageUrl, int mediaItemId, bool itemHasLike, bool itemHasDislike)
+    {
+        currentImageUrl = imageUrl;
+        currentMediaItemId = mediaItemId;
+        hasLike = itemHasLike;
+        hasDislike = itemHasDislike;
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        isVisible = false;
+        StateHasChanged();
+    }
+
+    public void UpdateReactions(int mediaItemId, bool itemHasLike, bool itemHasDislike)
+    {
+        if (currentMediaItemId == mediaItemId)
+        {
+            hasLike = itemHasLike;
+            hasDislike = itemHasDislike;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleReaction(string reactionType)
+    {
+        await OnReactionToggle.InvokeAsync(new ReactionToggleEventArgs
+        {
+            MediaItemId = currentMediaItemId,
+            ReactionType = reactionType
+        });
+    }
+}

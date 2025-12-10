@@ -4,5 +4,6 @@
   <Project Path="PersonalMedia.Data/PersonalMedia.Data.csproj" />
   <Project Path="PersonalMedia.Services/PersonalMedia.Services.csproj" />
   <Project Path="PersonalMedia.Functions/PersonalMedia.Functions.csproj" />
-  <Project Path="PersonalMedia.Web/PersonalMedia.Web.csproj" />
+  <Project Path="PersonalMedia.Blazor.Server/PersonalMedia.Blazor.Server.csproj" />
+  <Project Path="PersonalMedia.Blazor.Client/PersonalMedia.Blazor.Client.csproj" />
 </Solution>

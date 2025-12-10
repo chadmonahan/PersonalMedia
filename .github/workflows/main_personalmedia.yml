@@ -24,10 +24,10 @@ jobs:
           dotnet-version: '10.x'
 
       - name: Build with dotnet
-        run: dotnet build PersonalMedia.Web/PersonalMedia.Web.csproj --configuration Release
+        run: dotnet build PersonalMedia.Blazor.Server/PersonalMedia.Blazor.Server.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish PersonalMedia.Web/PersonalMedia.Web.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish PersonalMedia.Blazor.Server/PersonalMedia.Blazor.Server.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -62,4 +62,5 @@ jobs:
           app-name: 'personalmedia'
           slot-name: 'Production'
           package: .
+          clean: true
           

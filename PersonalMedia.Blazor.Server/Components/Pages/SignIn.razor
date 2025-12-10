@@ -1,0 +1,56 @@
+@page "/signin"
+@page "/"
+@inject IAuthenticationService AuthService
+@inject NavigationManager Navigation
+
+<PageTitle>Sign In - Personal Media</PageTitle>
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Sign In</h2>
+
+                    @if (showError)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            Invalid access code. Please try again.
+                        </div>
+                    }
+
+                    <form method="post" action="/auth/login">
+                        <div class="mb-3">
+                            <label for="code" class="form-label">Access Code</label>
+                            <input type="password"
+                                   class="form-control form-control-lg text-center"
+                                   id="code"
+                                   name="code"
+                                   required
+                                   autofocus
+                                   maxlength="10" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Enter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool showError;
+
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? Error { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (AuthService.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/app", forceLoad: true);
+        }
+
+        showError = Error == "invalid";
+    }
+}

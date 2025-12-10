@@ -1,0 +1,287 @@
+@inject IJSRuntime JSRuntime
+
+<div class="carousel-container">
+    @if (MediaSet.MediaItems.Count > 1)
+    {
+        <button class="carousel-nav prev" @onclick="() => ScrollCarousel(-1)">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+            </svg>
+        </button>
+    }
+
+    <div class="image-carousel" id="carousel-@MediaSet.Id" @ref="carouselElement">
+        @foreach (var item in MediaSet.MediaItems.Where(m => m.IsActive))
+        {
+            var hasLike = item.Reactions?.Any(r => r.ReactionType == ReactionType.Like) ?? false;
+            var hasDislike = item.Reactions?.Any(r => r.ReactionType == ReactionType.Dislike) ?? false;
+
+            <div class="image-container" data-item-id="@item.Id">
+                <div class="image-wrapper">
+                    @if (!string.IsNullOrEmpty(item.AzureStorageUrl))
+                    {
+                        <img src="@item.AzureStorageUrl"
+                             alt="Media item"
+                             class="media-image"
+                             @onclick="() => HandleImageClick(item.AzureStorageUrl, item.Id, hasLike, hasDislike)">
+                    }
+                    else
+                    {
+                        <div class="placeholder-image">
+                            <span>Generating...</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="reaction-buttons">
+                    <button class="btn-reaction btn-like @(hasLike ? "active" : "")"
+                            @onclick="@(() => HandleReaction(item.Id, "like"))">
+                        <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                        </svg>
+                    </button>
+                    <button class="btn-reaction btn-dislike @(hasDislike ? "active" : "")"
+                            @onclick="@(() => HandleReaction(item.Id, "dislike"))">
+                        <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (MediaSet.MediaItems.Count > 1)
+    {
+        <button class="carousel-nav next" @onclick="() => ScrollCarousel(1)">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+            </svg>
+        </button>
+    }
+</div>
+
+@if (MediaSet.MediaItems.Count > 1)
+{
+    <div class="carousel-indicators">
+        @for (int i = 0; i < MediaSet.MediaItems.Count; i++)
+        {
+            var index = i;
+            <span class="indicator @(currentIndex == index ? "active" : "")"
+                  @onclick="() => GoToIndex(index)"></span>
+        }
+    </div>
+}
+
+<style>
+    .carousel-container {
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .image-carousel {
+        display: flex;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .image-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .image-container {
+        flex: 0 0 100%;
+        scroll-snap-align: center;
+        padding: 0 10px;
+    }
+
+    .image-wrapper {
+        position: relative;
+        width: 100%;
+        max-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .media-image {
+        max-width: 100%;
+        max-height: 70vh;
+        object-fit: contain;
+        cursor: pointer;
+        touch-action: pan-y pinch-zoom;
+    }
+
+    .placeholder-image {
+        width: 100%;
+        height: 400px;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 1.2rem;
+    }
+
+    .reaction-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 20px;
+    }
+
+    .btn-reaction {
+        background: white;
+        border: 3px solid #ddd;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        padding: 0;
+    }
+
+    .btn-reaction:hover {
+        transform: scale(1.1);
+    }
+
+    .btn-like.active {
+        background: #ff69b4;
+        border-color: #ff1493;
+    }
+
+    .btn-like.active svg {
+        fill: white;
+    }
+
+    .btn-dislike.active {
+        background: #dc3545;
+        border-color: #a71d2a;
+    }
+
+    .btn-dislike.active svg {
+        fill: white;
+    }
+
+    .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s;
+    }
+
+    .carousel-nav:hover {
+        background: rgba(255, 255, 255, 1);
+    }
+
+    .carousel-nav.prev {
+        left: 10px;
+    }
+
+    .carousel-nav.next {
+        right: 10px;
+    }
+
+    .carousel-indicators {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    .indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ddd;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .indicator.active {
+        background: #007bff;
+        width: 12px;
+        height: 12px;
+    }
+
+    @@media (max-width: 768px) {
+        .carousel-nav {
+            width: 40px;
+            height: 40px;
+        }
+
+        .btn-reaction {
+            width: 50px;
+            height: 50px;
+        }
+
+        .btn-reaction svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public required MediaSet MediaSet { get; set; }
+
+    [Parameter]
+    public EventCallback<ReactionToggleEventArgs> OnReactionToggle { get; set; }
+
+    [Parameter]
+    public EventCallback<ImageClickEventArgs> OnImageClick { get; set; }
+
+    private ElementReference carouselElement;
+    private int currentIndex = 0;
+
+    private async Task ScrollCarousel(int direction)
+    {
+        var itemCount = MediaSet.MediaItems.Count(m => m.IsActive);
+        currentIndex = Math.Max(0, Math.Min(currentIndex + direction, itemCount - 1));
+        await JSRuntime.InvokeVoidAsync("scrollCarouselTo", carouselElement, currentIndex);
+    }
+
+    private async Task GoToIndex(int index)
+    {
+        currentIndex = index;
+        await JSRuntime.InvokeVoidAsync("scrollCarouselTo", carouselElement, index);
+    }
+
+    private async Task HandleReaction(int mediaItemId, string reactionType)
+    {
+        await OnReactionToggle.InvokeAsync(new ReactionToggleEventArgs
+        {
+            MediaItemId = mediaItemId,
+            ReactionType = reactionType
+        });
+    }
+
+    private async Task HandleImageClick(string imageUrl, int mediaItemId, bool hasLike, bool hasDislike)
+    {
+        await OnImageClick.InvokeAsync(new ImageClickEventArgs
+        {
+            ImageUrl = imageUrl,
+            MediaItemId = mediaItemId,
+            HasLike = hasLike,
+            HasDislike = hasDislike
+        });
+    }
+}
