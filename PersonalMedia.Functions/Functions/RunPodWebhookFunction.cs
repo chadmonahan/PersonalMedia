@@ -32,7 +32,7 @@ public class RunPodWebhookFunction
         _configuration = configuration;
     }
 
-    [Function("RunPodWebhook")]
+    // [Function("RunPodWebhook")] // Disabled for testing
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "runpod-webhook")]
         HttpRequestData req)

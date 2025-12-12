@@ -23,7 +23,7 @@ public class OrphanedJobCleanupFunction
         _configuration = configuration;
     }
 
-    [Function("CleanupOrphanedJobs")]
+    // [Function("CleanupOrphanedJobs")] // Disabled for testing
     public async Task Run([TimerTrigger("0 0 * * * *")] TimerInfo timerInfo)
     {
         _logger.LogInformation("Starting orphaned job cleanup at: {Time}", DateTime.Now);

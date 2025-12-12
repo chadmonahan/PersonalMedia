@@ -26,7 +26,7 @@ public class ImageGenerationFunction
         _azureStorageService = azureStorageService;
     }
 
-    [Function("GenerateNightlyImages")]
+    // [Function("GenerateNightlyImages")] // Disabled for testing
     public async Task Run([TimerTrigger("0 0 3 * * *")] TimerInfo timerInfo)
     {
         _logger.LogInformation("Starting nightly image generation at: {Time}", DateTime.Now);

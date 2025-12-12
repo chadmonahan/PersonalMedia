@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>PersonalMedia.Functions</RootNamespace>
     <AssemblyName>PersonalMedia.Functions</AssemblyName>
+    <UserSecretsId>8805d119-a437-4a93-aeb3-dad9111ea0c7</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
