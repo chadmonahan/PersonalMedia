@@ -1,10 +1,14 @@
 {
     "version": "2.0",
     "logging": {
+        "logLevel": {
+            "default": "Information",
+            "Function.TestTimerFunction": "Information"
+        },
         "applicationInsights": {
             "samplingSettings": {
                 "isEnabled": true,
-                "excludedTypes": "Request"
+                "excludedTypes": "Request;Trace"
             },
             "enableLiveMetricsFilters": true
         }
